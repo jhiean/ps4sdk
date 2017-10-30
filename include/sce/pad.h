@@ -10,3 +10,5 @@ int scePadClose(int handle);
 int scePadRead(int handle, ScePadData *data, int count);
 int scePadReadState(int handle, ScePadData *data);
 
+int scePadSetLightBar(int handle, uinit32_t* rgb);
+int scePadResetLightBar(int handle);
