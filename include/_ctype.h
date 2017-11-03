@@ -119,13 +119,6 @@ __sbistype(__ct_rune_t _c, unsigned long _f)
 	return (!!__sbmaskrune(_c, _f));
 }
 
-static __inline int
-__isctype(__ct_rune_t _c, unsigned long _f)
-{
-	return (_c < 0 || _c >= 128) ? 0 :
-	       !!(_DefaultRuneLocale.__runetype[_c] & _f);
-}
-
 static __inline __ct_rune_t
 __toupper(__ct_rune_t _c)
 {
@@ -174,7 +167,7 @@ int		__maskrune(__ct_rune_t, unsigned long);
 int		__sbmaskrune(__ct_rune_t, unsigned long);
 int		__istype(__ct_rune_t, unsigned long);
 int		__sbistype(__ct_rune_t, unsigned long);
-int		__isctype(__ct_rune_t, unsigned long);
+
 __ct_rune_t	__toupper(__ct_rune_t);
 __ct_rune_t	__sbtoupper(__ct_rune_t);
 __ct_rune_t	__tolower(__ct_rune_t);
