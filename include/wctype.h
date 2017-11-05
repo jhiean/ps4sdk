@@ -89,19 +89,20 @@ wint_t	nextwctype(wint_t, wctype_t);
 #endif
 __END_DECLS
 
+#ifndef __cplusplus
 #define	iswalnum(wc)		__istype((wc), _CTYPE_A|_CTYPE_D)
 #define	iswalpha(wc)		__istype((wc), _CTYPE_A)
 #define	iswblank(wc)		__istype((wc), _CTYPE_B)
 #define	iswcntrl(wc)		__istype((wc), _CTYPE_C)
 #define	iswctype(wc, charclass)	__istype((wc), (charclass))
-
+#define iswdigit(wc)		__isctype((wc), _CTYPE_D)
 #define	iswgraph(wc)		__istype((wc), _CTYPE_G)
 #define	iswlower(wc)		__istype((wc), _CTYPE_L)
 #define	iswprint(wc)		__istype((wc), _CTYPE_R)
 #define	iswpunct(wc)		__istype((wc), _CTYPE_P)
 #define	iswspace(wc)		__istype((wc), _CTYPE_S)
 #define	iswupper(wc)		__istype((wc), _CTYPE_U)
-
+#define iswxdigit(wc)		__isctype((wc), _CTYPE_X)
 #define	towlower(wc)		__tolower(wc)
 #define	towupper(wc)		__toupper(wc)
 
@@ -113,6 +114,7 @@ __END_DECLS
 #define	iswphonogram(wc)	__istype((wc), _CTYPE_Q)
 #define	iswrune(wc)		__istype((wc), 0xFFFFFF00L)
 #define	iswspecial(wc)		__istype((wc), _CTYPE_T)
-#endif
+#endif /* __BSD_VISIBLE */
+#endif /* __cplusplus */
 
 #endif		/* _WCTYPE_H_ */
