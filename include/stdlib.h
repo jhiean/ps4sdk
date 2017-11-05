@@ -75,7 +75,7 @@ extern int __mb_cur_max;
 #define	MB_CUR_MAX	__mb_cur_max
 
 __BEGIN_DECLS
-void	 abort(void) __dead2;
+_Noreturn void   abort(void);
 int	 abs(int) __pure2;
 int	 atexit(void (*)(void));
 double	 atof(const char *);
@@ -144,7 +144,7 @@ unsigned long long
 	 strtoull(const char * __restrict, char ** __restrict, int);
 #endif /* __LONG_LONG_SUPPORTED */
 
-void	 _Exit(int) __dead2;
+_Noreturn void   _Exit(int);
 #endif /* __ISO_C_VISIBLE >= 1999 */
 
 /*
