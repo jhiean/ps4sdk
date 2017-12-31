@@ -18,55 +18,73 @@ static struct mtx *ps4KernelSymbolLookUpMutex; // FIXME: Use RW lock or RM locks
 
 int ps4KernelSymbolLookUp(const char *str, void **value)
 {
-	int r;
 
 	if(str == NULL)
 		return PS4_ERROR_ARGUMENT_PRIMARY_MISSING;
 	if(value == NULL)
 		return PS4_ERROR_ARGUMENT_OUT_MISSING;
 
-	if(cache == NULL)
+	int static swVer = -1;
+	if(swVer == -1)
 	{
-		struct mtx *giant = ps4KernelDlSym("Giant");
+		uint32_t ver;
+		size_t len;
+		sysctlbyname("kern.sdk_version", &ver, &len, NULL, 0);
+		swVer = (ver >> 16);
+	}
 
-		mtx_lock(giant);
-		r = ps4KernelCacheGlobalGet(PS4_KERNEL_CACHE_SYMBOL_LOOKUP_CACHE, (void **)&cache);
-		if(r != PS4_OK)
+	if(swVer > 176)
+	{
+		void **address = NULL;
+		return static_lookup(str, value, swVer);
+	}
+	else
+	{
+		int r;
+
+		if(cache == NULL)
 		{
-			r = ps4KernelCacheCreate(&cache);
+			struct mtx *giant = ps4KernelDlSym("Giant");
+
+			mtx_lock(giant);
+			r = ps4KernelCacheGlobalGet(PS4_KERNEL_CACHE_SYMBOL_LOOKUP_CACHE, (void **)&cache);
 			if(r != PS4_OK)
 			{
-				mtx_unlock(giant);
-				return r;
-			}
-			ps4KernelCacheGlobalSet(PS4_KERNEL_CACHE_SYMBOL_LOOKUP_CACHE, cache);
+				r = ps4KernelCacheCreate(&cache);
+				if(r != PS4_OK)
+				{
+					mtx_unlock(giant);
+					return r;
+				}
+				ps4KernelCacheGlobalSet(PS4_KERNEL_CACHE_SYMBOL_LOOKUP_CACHE, cache);
 
-			ps4KernelMemoryAllocateData((void **)&ps4KernelSymbolLookUpMutex, sizeof(struct mtx));
-			if(ps4KernelSymbolLookUpMutex == NULL)
-			{
-				ps4KernelCacheDestroy(cache);
-				mtx_unlock(giant);
-				return PS4_ERROR_KERNEL_OUT_OF_MEMORY;
+				ps4KernelMemoryAllocateData((void **)&ps4KernelSymbolLookUpMutex, sizeof(struct mtx));
+				if(ps4KernelSymbolLookUpMutex == NULL)
+				{
+					ps4KernelCacheDestroy(cache);
+					mtx_unlock(giant);
+					return PS4_ERROR_KERNEL_OUT_OF_MEMORY;
+				}
+				mtx_init(ps4KernelSymbolLookUpMutex, "ps4KernelSymbolLookUpMutex", NULL, MTX_DEF | MTX_RECURSE);
+				ps4KernelCacheGlobalSet(PS4_KERNEL_CACHE_SYMBOL_LOOKUP_MUTEX, ps4KernelSymbolLookUpMutex);
 			}
-			mtx_init(ps4KernelSymbolLookUpMutex, "ps4KernelSymbolLookUpMutex", NULL, MTX_DEF | MTX_RECURSE);
-			ps4KernelCacheGlobalSet(PS4_KERNEL_CACHE_SYMBOL_LOOKUP_MUTEX, ps4KernelSymbolLookUpMutex);
+			else
+				r = ps4KernelCacheGlobalGet(PS4_KERNEL_CACHE_SYMBOL_LOOKUP_MUTEX, (void **)&ps4KernelSymbolLookUpMutex);
+			mtx_unlock(giant);
 		}
-		else
-			r = ps4KernelCacheGlobalGet(PS4_KERNEL_CACHE_SYMBOL_LOOKUP_MUTEX, (void **)&ps4KernelSymbolLookUpMutex);
-		mtx_unlock(giant);
-	}
 
-	mtx_lock(ps4KernelSymbolLookUpMutex);
-	r = ps4KernelCacheGet(cache, str, value);
-	if(r != PS4_OK)
-	{
-		void *v = ps4KernelDlSym((char *)str);
-		ps4KernelCacheSet(cache, str, v);
-		*value = v;
-		if(v == NULL)
-			return PS4_ERROR_KERNEL_SYMBOL_LOOKUP_NOT_FOUND;
-	}
-	mtx_unlock(ps4KernelSymbolLookUpMutex);
+		mtx_lock(ps4KernelSymbolLookUpMutex);
+		r = ps4KernelCacheGet(cache, str, value);
+		if(r != PS4_OK)
+		{
+			void *v = ps4KernelDlSym((char *)str);
+			ps4KernelCacheSet(cache, str, v);
+			*value = v;
+			if(v == NULL)
+				return PS4_ERROR_KERNEL_SYMBOL_LOOKUP_NOT_FOUND;
+		}
+		mtx_unlock(ps4KernelSymbolLookUpMutex);
 
-	return PS4_OK;
+		return PS4_OK;
+	}
 }
