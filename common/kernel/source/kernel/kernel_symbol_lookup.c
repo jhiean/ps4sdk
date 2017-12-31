@@ -7,8 +7,7 @@ typedef struct sym_t
 } sym_t;
 
 sym_t table405[] = {
-	{ "foo", 0xDEADB00B },
-	{ "bar", 0x41414141 },
+	#include "./405_symbols.inc"
 	{ NULL, 0 },
 };
 
