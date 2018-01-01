@@ -4,6 +4,8 @@
 //{
 void *ps4KernelSeekElfAddress();
 void *ps4KernelDlSym(char *name);
+int static_lookup(const char *name, void **value, int swVer);
+
 //}
 
 int ps4KernelBrewCoffee();
