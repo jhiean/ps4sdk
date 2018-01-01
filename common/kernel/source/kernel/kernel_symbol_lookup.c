@@ -13,6 +13,8 @@ sym_t table405[] = {
 
 int static_lookup(const char *name, void **value, int swVer)
 {
+	void* kernel_base = ps4KernelSeekElfAddress();
+
 	sym_t* table;
 	switch(swVer)
 	{
@@ -27,7 +29,7 @@ int static_lookup(const char *name, void **value, int swVer)
 	{
 		if (strcmp(p->name, name) == 0)
 		{
-			*value = p->address;
+			*value = kernel_base + p->address;
 			return PS4_OK;
 		}
 	}
