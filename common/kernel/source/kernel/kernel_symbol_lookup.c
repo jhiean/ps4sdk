@@ -3,7 +3,7 @@
 typedef struct sym_t
 {
 	const char *name;
-	int address;
+	int offset;
 } sym_t;
 
 sym_t table405[] = {
@@ -29,7 +29,7 @@ int static_lookup(const char *name, void **value, int swVer)
 	{
 		if (strcmp(p->name, name) == 0)
 		{
-			*value = kernel_base + p->address;
+			*value = *kernel_base + p->offset;
 			return PS4_OK;
 		}
 	}
