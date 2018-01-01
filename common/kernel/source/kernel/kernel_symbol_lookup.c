@@ -29,7 +29,7 @@ int static_lookup(const char *name, void **value, int swVer)
 	{
 		if (strcmp(p->name, name) == 0)
 		{
-			*value = *kernel_base + p->offset;
+			*value = (uint64_t *)kernel_base + p->offset;
 			return PS4_OK;
 		}
 	}

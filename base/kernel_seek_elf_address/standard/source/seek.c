@@ -1,9 +1,6 @@
 #include <stddef.h>
 
-#define PS4_KERNEL_ELF_RANGE_ADDRESS (char *)0xffffffff80000000
 enum{ PS4_KERNEL_ELF_RANGE_SIZE = 0x02000000 };
-#define PS4_KERNEL_ELF_FIXED_ADDRESS (char *)0xffffffff80700000
-//enum{ PS4_KERNELEL_ELF_SIZE = 0x00EAC180 };
 enum{ PS4_KERNEL_ELF_PAGE_SIZE = 16 * 1024 }; // no dependencies
 
 void *findClosestPageStart(int addr)
