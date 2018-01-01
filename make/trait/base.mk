@@ -7,6 +7,9 @@ Libraries += -lPs4_base_stub_resolve_minimal
 Libraries += -lPs4_base_kernel_dlsym_standard
 Libraries += -lPs4_base_kernel_seek_elf_address_standard
 
+# tmp work around, need to sort dependencies order
+Libraries += -lkernel_stub
+
 #Ability to push / pop all arguments in registers from assembler
 #Used in stub relove
 Libraries += -lPs4_base_assembler_register_parameter_standard
