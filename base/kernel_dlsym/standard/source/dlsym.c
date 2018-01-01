@@ -53,7 +53,7 @@ void *ps4KernelDlSym(char *name)
 		swVer = (ver >> 16);
 	}
 
-	if(swVer > 176)
+	if(swVer > 0x176)
 	{
 		void **address = NULL;
 		static_lookup(name, address, swVer);
