@@ -30,7 +30,11 @@ int ps4StubResolve(void *stub, char *moduleName, char *functionName, int *module
 			int k = 0;
 			ps4StubResolveSystemCall(594, "libkernel.sprx", 0, &k, 0);
 			if(k <= 0)
-				return -1;
+				ps4StubResolveSystemCall(594, "libkernel_web.sprx", 0, &k, 0);
+				if(k <= 0)
+					ps4StubResolveSystemCall(594, "libkernel_sys.sprx", 0, &k, 0);
+					if(k <= 0)
+						return -1;
 			if(ps4StubResolveSystemCall(591, k, "sceKernelLoadStartModule", (void **)&ps4StubResolveLoadStartModule) != 0)
 				return -1;
 		}

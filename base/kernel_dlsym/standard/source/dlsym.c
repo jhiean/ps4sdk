@@ -40,6 +40,26 @@ static void ps4KernelDlSymInitialize(void)
 
 void *ps4KernelDlSym(char *name)
 {
+
+	if(name == NULL)
+		return NULL;
+
+	int static swVer = -1;
+	if(swVer == -1)
+	{
+		uint32_t ver;
+		size_t len;
+		sysctlbyname("kern.sdk_version", &ver, &len, NULL, 0);
+		swVer = (ver >> 16);
+	}
+
+	if(swVer > 176)
+	{
+		void **address = NULL;
+		static_lookup(name, address, swVer);
+		return address;
+	}
+
 	Elf64_Sym *symbol;
 
 	if(ps4KernelDlSymElfSymbols == NULL || ps4KernelDlSymElfStrings == NULL)
